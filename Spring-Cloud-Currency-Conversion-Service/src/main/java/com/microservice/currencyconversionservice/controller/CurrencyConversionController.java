@@ -1,6 +1,8 @@
 package com.microservice.currencyconversionservice.controller;
 
 import com.microservice.currencyconversionservice.controller.model.CurrencyConversion;
+import com.microservice.currencyconversionservice.proxy.CurrencyExchangeProxy;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,6 +16,9 @@ import java.util.Map;
 @RestController
 public class CurrencyConversionController {
 
+    @Autowired
+    private CurrencyExchangeProxy currencyExchangeProxy;
+
     @GetMapping("/currency-conversion/from/{FROM}/to/{TO}/quantity/{QUANTITY}")
     public CurrencyConversion calculateConversion(@PathVariable("FROM") String from, @PathVariable("TO") String to,
             @PathVariable("QUANTITY") BigDecimal quantity) {
@@ -26,6 +31,16 @@ public class CurrencyConversionController {
         CurrencyConversion currencyConversion = responseEntity.getBody();
 
         return new CurrencyConversion(currencyConversion.getId(), from, to, quantity, currencyConversion.getConversionMultiple(),
-                quantity.multiply(currencyConversion.getConversionMultiple()), currencyConversion.getEnvironment());
+                quantity.multiply(currencyConversion.getConversionMultiple()), currencyConversion.getEnvironment() + "rest template");
+    }
+
+    @GetMapping("/currency-conversion-feign/from/{FROM}/to/{TO}/quantity/{QUANTITY}")
+    public CurrencyConversion calculateConversionFeign(@PathVariable("FROM") String from, @PathVariable("TO") String to,
+            @PathVariable("QUANTITY") BigDecimal quantity) {
+
+        CurrencyConversion currencyConversion = currencyExchangeProxy.retrieveExhangeValue(from, to);
+
+        return new CurrencyConversion(currencyConversion.getId(), from, to, quantity, currencyConversion.getConversionMultiple(),
+                quantity.multiply(currencyConversion.getConversionMultiple()), currencyConversion.getEnvironment() + " feign");
     }
 }
