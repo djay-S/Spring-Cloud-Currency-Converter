@@ -38,7 +38,7 @@ public class CurrencyConversionController {
     public CurrencyConversion calculateConversionFeign(@PathVariable("FROM") String from, @PathVariable("TO") String to,
             @PathVariable("QUANTITY") BigDecimal quantity) {
 
-        CurrencyConversion currencyConversion = currencyExchangeProxy.retrieveExhangeValue(from, to);
+        CurrencyConversion currencyConversion = currencyExchangeProxy.retrieveExchangeValue(from, to);
 
         return new CurrencyConversion(currencyConversion.getId(), from, to, quantity, currencyConversion.getConversionMultiple(),
                 quantity.multiply(currencyConversion.getConversionMultiple()), currencyConversion.getEnvironment() + " feign");
