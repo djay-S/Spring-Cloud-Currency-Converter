@@ -9,7 +9,7 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 @Component
-//This can be helpful in implementing features such as Authentication that is needed for all the requests
+//This can be helpful in implementing global features such as Authentication that is needed for all the requests
 public class LoggingFilter implements GlobalFilter {
 
     private final Logger logger = LoggerFactory.getLogger(LoggingFilter.class);
