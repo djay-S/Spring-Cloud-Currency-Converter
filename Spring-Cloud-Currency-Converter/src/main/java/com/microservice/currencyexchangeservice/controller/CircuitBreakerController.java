@@ -1,6 +1,8 @@
 package com.microservice.currencyexchangeservice.controller;
 
+import io.github.resilience4j.bulkhead.annotation.Bulkhead;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.github.resilience4j.retry.annotation.Retry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,10 +28,18 @@ public class CircuitBreakerController {
 
 //    https://resilience4j.readme.io/docs/circuitbreaker
     @CircuitBreaker(name = "sample-api", fallbackMethod = "fallbackMethod")
+
+//    Rate limiter sets a specific number of calls for a given time period for a specific api name
+//    Throws: io.github.resilience4j.ratelimiter.RequestNotPermitted: RateLimiter 'default' does not permit further calls if more calls are sent
+    @RateLimiter(name = "default")
+
+    @Bulkhead(name = "default")
     public String sampleApi() {
-        logger.info("Sample Api Called. Timestamp: {}", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(LocalDateTime.now()));
-        ResponseEntity<String> forEntity = new RestTemplate().getForEntity("http://localhost:8081/this-url-fails", String.class);
-        return forEntity.getBody();
+        String timeStamp = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(LocalDateTime.now());
+        logger.info("Sample Api Called. Timestamp: {}", timeStamp);
+//        ResponseEntity<String> forEntity = new RestTemplate().getForEntity("http://localhost:8081/this-url-fails", String.class);
+//        return forEntity.getBody();
+        return "Sample-Api: " + timeStamp;
     }
 
     public String fallbackMethod(Exception e) {
